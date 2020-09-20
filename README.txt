@@ -6,4 +6,4 @@ SCDB_2019_01_justiceCentered_Citation.csv includes justcie centered data downloa
 measures.csv includes segal-cover and martin-quinn scores downloaded from: http://scdb.wustl.edu/data.php?s=5
 This is old data so use this instead 
 
-justicescores.csv downloaed from: https://mqscores.lsa.umich.edu/measures.php
+mqscores.csv downloaed from: https://mqscores.lsa.umich.edu/measures.php
