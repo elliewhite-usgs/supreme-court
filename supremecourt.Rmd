@@ -1,0 +1,48 @@
+---
+title: "supremecourt"
+author: "Ellie White"
+date: "9/19/2020"
+output: html_document
+---
+
+```{r data}
+load("inputs/SCDB_2019_01_justiceCentered_Citation.Rdata")
+rulings <- SCDB_2019_01_justiceCentered_Citation
+rm(SCDB_2019_01_justiceCentered_Citation)
+justices <- read.csv("inputs/justices.csv")
+measures <- read.csv("inputs/mqscores.csv")
+
+# clean up, merge, and make pretty
+justices$LASTNAME <- sapply(strsplit(justices$notes, ","), "[", 1)
+
+measures <- merge(measures, justices, by=c("justice", "justiceName"))
+```
+
+```{r measures_plots}
+measures$PLOTNAME <- ifelse(measures$justiceName %in% c("AScalia", "AMKennedy", "CThomas", "RBGinsburg", "SGBreyer", "JGRoberts", "SAAlito", "SSotomayor", "EKagan", "NMGorsuch", "BMKavanaugh"), measures$LASTNAME, "Other")
+
+measures$PLOTNAME <- factor(measures$PLOTNAME, levels=c("Thomas", "Alito", "Scalia", "Gorsuch", "Kavanaugh", "Kennedy", "Roberts", "Kagan", "Breyer","Ginsburg","Sotomayor", "Other"))
+
+measuresmin <- measures[which.min(measures$post_mn),]
+measuresmax <- measures[which.max(measures$post_mn),]
+
+library(ggplot2)
+png("outputs/mean_mq_scores.png", width=6, height=4, units="in", pointsize=8, res=300)
+  ggplot(measures, aes(x=term, y=post_mn, color=PLOTNAME))+
+    geom_point()+
+    scale_color_manual(values=c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2", "grey75"), name="")+
+    xlab("")+
+    ylab("Mean Martin-Quinn Score\nliberal(-) to conservative(+)")+
+    geom_point(data=measuresmin, color="grey45")+
+    geom_text(data=measuresmin, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+    geom_point(data=measuresmax, color="grey45")+
+    geom_text(data=measuresmax, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+    theme_bw()
+dev.off()
+```
+
+
+
+
+
+
