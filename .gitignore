@@ -1,0 +1,11 @@
+# ignore r generated files
+*.log
+*.Rproj
+.Rproj.user
+.RData
+.Rhistory
+.RDataTmp
+.RDataTmp1
+
+
+ 
