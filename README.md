@@ -61,22 +61,20 @@ Once you have downloaded the R Markdown file, open it in RStudio by navigating t
 You can run the R Markdown file by clicking on the "Knit" button in RStudio, or by running the following command in the console:
 
 
-
 ## Conclusion
 
 Thank you for using this Git repository! We hope that you find the R Markdown file useful for your data analysis or report writing needs. If you have any questions or feedback, please feel free to contact me white.elaheh@gmail.com.
-
 
 
 ## Want to Update with New Data?
 
 Data was last updated 05/22/2023.
 
-Justices.csv is a copy pasted table from: http://scdb.wustl.edu/documentation.php?var=justice#norms
+* `Justices.csv` is a copy pasted table from: http://scdb.wustl.edu/documentation.php?var=justice#norms
 
-SCDB_2019_01_justiceCentered_Citation.Rdata includes justcie centered data downloaded from: http://scdb.wustl.edu/data.php
+* `SCDB_2019_01_justiceCentered_Citation.Rdata` includes justcie centered data downloaded from: http://scdb.wustl.edu/data.php
 
-measures.csv includes segal-cover and martin-quinn scores downloaded from: http://scdb.wustl.edu/data.php?s=5
+* `measures.csv` includes segal-cover and martin-quinn scores downloaded from: http://scdb.wustl.edu/data.php?s=5
 This is old data so use this instead 
 
-mqscores.csv was downloaed from: https://mqscores.lsa.umich.edu/measures.php
+* `mqscores.csv` was downloaed from: https://mqscores.lsa.umich.edu/measures.php
