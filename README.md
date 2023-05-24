@@ -68,7 +68,7 @@ Thank you for using this Git repository! We hope that you find the R Markdown fi
 
 
 
-## Want to Update with new data?
+## Want to Update with New Data?
 
 Data was last updated 05/22/2023.
 
