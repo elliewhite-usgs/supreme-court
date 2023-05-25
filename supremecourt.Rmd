@@ -8,7 +8,7 @@ output: html_document
 ```{r data}
 load("inputs/SCDB_2022_01_justiceCentered_Citation.Rdata")
 rulings <- SCDB_2022_01_justiceCentered_Citation
-rm(SCDB_2019_01_justiceCentered_Citation)
+rm(SCDB_2022_01_justiceCentered_Citation)
 justices <- read.csv("inputs/justices.csv")
 measures <- read.csv("inputs/mqscores.csv")
 
@@ -16,30 +16,249 @@ measures <- read.csv("inputs/mqscores.csv")
 justices$LASTNAME <- sapply(strsplit(justices$notes, ","), "[", 1)
 
 measures <- merge(measures, justices, by=c("justice", "justiceName"))
+rulings <- merge(rulings, justices, by=c("justice", "justiceName"))
 ```
 
 ```{r measures_plots}
 measures$PLOTNAME <- ifelse(measures$justiceName %in% c("AScalia", "AMKennedy", "CThomas", "RBGinsburg", "SGBreyer", "JGRoberts", "SAAlito", "SSotomayor", "EKagan", "NMGorsuch", "BMKavanaugh", "ACBarrett"), measures$LASTNAME, "Other")
 
-measures$PLOTNAME <- factor(measures$PLOTNAME, levels=c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Kennedy", "Roberts", "Kagan", "Breyer","Ginsburg","Sotomayor", "Other"))
+measures$PLOTNAME <- factor(measures$PLOTNAME, levels=c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Roberts", "Kennedy", "Kagan", "Breyer","Ginsburg","Sotomayor", "Other"))
 
 measuresmin <- measures[which.min(measures$post_mn),]
 measuresmax <- measures[which.max(measures$post_mn),]
 
 library(ggplot2)
-png("outputs/mean_mq_scores.png", width=6, height=4, units="in", pointsize=8, res=900)
+png("outputs/mean_mq_scores.png", width=6, height=4, units="in", pointsize=8, res=300)
   ggplot(measures, aes(x=term, y=post_mn, color=PLOTNAME))+
     geom_point()+
-    scale_colour_manual(values = c(rainbow(length(levels(measures$PLOTNAME))-1), "grey75"), name = "") + 
-    labs(x = "", y = "Mean Martin-Quinn Score\nliberal(-) to conservative(+)")+
+    scale_colour_manual(values = c(rainbow(length(levels(measures$PLOTNAME))-1), "grey75"), name = "") +
+    scale_x_continuous(breaks=seq(1935, 2020, 10)) +
+    scale_y_continuous(breaks=seq(-8, 6, 2)) +
+    labs(x="", y="\n\n\n\n", title='The Political Make-up of the U.S. Supreme Court', subtitle = "Given by The Martin-Quinn Score", caption = "Data source: https://mqscores.lsa.umich.edu/measures.php")+
+    annotate("text", x = 1925, y = -8, label = "Liberal", hjust=1, size=3) +
+    annotate("text", x = 1925, y = 6, label = "Conservative", hjust=1, size=3) +
+    coord_cartesian(ylim = c(-8, 6), xlim = c(1935, 2020), clip = "off") +
     geom_point(data=measuresmin, color="grey45")+
     geom_text(data=measuresmin, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
     geom_point(data=measuresmax, color="grey45")+
     geom_text(data=measuresmax, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+    theme_minimal()
+dev.off()
+
+# # bring color legend close to the points
+# png("outputs/mean_mq_scores_i2.png", width=6, height=4, units="in", pointsize=8, res=300)
+#   ggplot(measures, aes(x=term, y=post_mn, color=PLOTNAME))+
+#     geom_point(show.legend = FALSE)+ 
+#     scale_color_manual(values=c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2", "grey75"), name="") +
+#     scale_x_continuous(breaks=seq(1935, 2020, 10)) +
+#     scale_y_continuous(breaks=seq(-8, 5, 2)) +
+#     labs(x="", y="\n\n\n\n", title='The Political Make-up of the U.S. Supreme Court', subtitle = "Given by The Martin-Quinn Score", caption = "Data source: https://mqscores.lsa.umich.edu/measures.php")+
+#     annotate("text", x = 1925, y = -8, label = "Liberal", hjust=1, size=3) +
+#     annotate("text", x = 1925, y = 5, label = "Conservative", hjust=1, size=3) +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Thomas", "post_mn"], label = "Thomas", hjust=0, size=3, color="#9E0142") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Alito", "post_mn"], label = "Alito", hjust=0, size=3, color="#D53E4F") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Scalia", "post_mn"], label = "Scalia", hjust=0, size=3, color="#F46D43") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Gorsuch", "post_mn"], label = "Gorsuch", hjust=0, size=3, color="#FDAE61") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Kavanaugh", "post_mn"], label = "Kavanaugh", hjust=0, size=3, color="#FEE08B") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Roberts", "post_mn"], label = "Roberts", hjust=0, size=3, color="#FFFFBF") +
+#     annotate("text", x = 2021, y = measures[measures$term==2017 & measures$PLOTNAME=="Kennedy", "post_mn"], label = "Kennedy", hjust=0, size=3, color="#E6F598") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Kagan", "post_mn"], label = "Kagan", hjust=0, size=3, color="#ABDDA4") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Breyer", "post_mn"], label = "Breyer", hjust=0, size=3, color="#66C2A5") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Ginsburg", "post_mn"], label = "Ginsburg", hjust=0, size=3, color="#3288BD") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Sotomayor", "post_mn"], label = "Sotomayor", hjust=0, size=3, color="#5E4FA2") +
+#     annotate("text", x = 2021, y = -6, label = "Other", hjust=0, size=3, color="grey75") +
+#     coord_cartesian(ylim = c(-8, 5), xlim = c(1935, 2020), clip = "off") +
+#     geom_point(data=measuresmin, color="grey45")+
+#     geom_text(data=measuresmin, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+#     geom_point(data=measuresmax, color="grey45")+
+#     geom_text(data=measuresmax, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+#     theme_minimal()+
+#     theme(plot.margin=unit(c(1,3,0,1), "cm"))
+#   dev.off()
+# 
+# # change colors for readability
+# png("outputs/mean_mq_scores_i3.png", width=8, height=6, units="in", pointsize=8, res=300)
+#   ggplot(measures, aes(x=term, y=post_mn, color=PLOTNAME))+
+#     geom_point(show.legend = FALSE)+ 
+#     scale_color_manual(values=c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2", "grey75"), name="") +
+#     scale_x_continuous(breaks=seq(1935, 2020, 10)) +
+#     scale_y_continuous(breaks=seq(-8, 5, 2)) +
+#     labs(x="", y="\n\n\n\n", title='The Political Make-up of the U.S. Supreme Court', subtitle = "Given by The Martin-Quinn Score", caption = "Data source: https://mqscores.lsa.umich.edu/measures.php")+
+#     annotate("text", x = 1925, y = -8, label = "Liberal", hjust=1, size=3) +
+#     annotate("text", x = 1925, y = 5, label = "Conservative", hjust=1, size=3) +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Thomas", "post_mn"], label = "Thomas", hjust=0, size=3, color="#9E0142") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Alito", "post_mn"], label = "Alito", hjust=0, size=3, color="#D53E4F") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Scalia", "post_mn"], label = "Scalia", hjust=0, size=3, color="#F46D43") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Gorsuch", "post_mn"], label = "Gorsuch", hjust=0, size=3, color="#FDAE61") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Kavanaugh", "post_mn"], label = "Kavanaugh", hjust=0, size=3, color="#FEE08B") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Roberts", "post_mn"], label = "Roberts", hjust=0, size=3, color="#FFFFBF") +
+#     annotate("text", x = 2021, y = measures[measures$term==2017 & measures$PLOTNAME=="Kennedy", "post_mn"], label = "Kennedy", hjust=0, size=3, color="#E6F598") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Kagan", "post_mn"], label = "Kagan", hjust=0, size=3, color="#ABDDA4") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Breyer", "post_mn"], label = "Breyer", hjust=0, size=3, color="#66C2A5") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Ginsburg", "post_mn"], label = "Ginsburg", hjust=0, size=3, color="#3288BD") +
+#     annotate("text", x = 2021, y = measures[measures$term==2019 & measures$PLOTNAME=="Sotomayor", "post_mn"], label = "Sotomayor", hjust=0, size=3, color="#5E4FA2") +
+#     annotate("text", x = 2021, y = -6, label = "Other", hjust=0, size=3, color="grey75") +
+#     coord_cartesian(ylim = c(-8, 5), xlim = c(1935, 2020), clip = "off") +
+#     geom_point(data=measuresmin, color="grey45")+
+#     geom_text(data=measuresmin, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+#     geom_point(data=measuresmax, color="grey45")+
+#     geom_text(data=measuresmax, aes(label=LASTNAME), color="grey45", hjust=0.5, vjust=-0.75, size=3)+
+#     theme_minimal()+
+#     theme(plot.margin=unit(c(1,3,0,1), "cm"))
+#   dev.off()  
+```
+
+```{r decisiondirection_plots}
+# direction: 
+# 1	conservative
+# 2	liberal
+
+rulings$PLOTNAME <- ifelse(rulings$justiceName %in% c("AScalia", "AMKennedy", "CThomas", "RBGinsburg", "SGBreyer", "JGRoberts", "SAAlito", "SSotomayor", "EKagan", "NMGorsuch", "BMKavanaugh", "ACBarrett"), rulings$LASTNAME, "Other")
+rulings$PLOTNAME <- factor(rulings$PLOTNAME, levels=c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Roberts", "Kennedy", "Kagan", "Breyer","Ginsburg","Sotomayor", "Other"))
+
+png("outputs/decision_direction.png", width=6.5, height=4, units="in", pointsize=8, res=300)
+  ggplot(rulings, aes(x=dateDecision, y=direction, color=PLOTNAME))+
+    geom_line(show.legend = FALSE)+
+    scale_colour_manual(values = c(rainbow(length(levels(rulings$PLOTNAME))-1), "grey75"), name = "") +
+    facet_wrap(~PLOTNAME)+
+    xlab("")+
+    ylab("Decision Direction\nconservative(1), liberal(2)")+
+    theme_minimal()
+dev.off()
+
+plot(rulings[rulings$PLOTNAME=="Alito", "dateDecision"], rulings[rulings$PLOTNAME=="Alito", "direction"])
+plot(rulings[rulings$PLOTNAME=="Scalia", "dateDecision"], rulings[rulings$PLOTNAME=="Scalia", "direction"])
+plot(rulings[rulings$PLOTNAME=="Sotomayor", "dateDecision"], rulings[rulings$PLOTNAME=="Sotomayor", "direction"])
+plot(rulings[rulings$PLOTNAME=="Ginsburg", "dateDecision"], rulings[rulings$PLOTNAME=="Ginsburg", "direction"])
+
+plot(acf(na.omit(rulings[rulings$PLOTNAME=="Ginsburg", "direction"])))
+
+# calculate the percentage of times voted  conservative=1 vs. liberal=2 
+sum(rulings[rulings$PLOTNAME=="Ginsburg", "direction"]==1, na.rm = TRUE)
+sum(rulings[rulings$PLOTNAME=="Ginsburg", "direction"]==2, na.rm = TRUE)
+
+sum(rulings[rulings$PLOTNAME=="Ginsburg", "direction"]==1, na.rm = TRUE) + sum(rulings[rulings$PLOTNAME=="Ginsburg", "direction"]==2, na.rm = TRUE)
+```
+
+```{r vote_plot}
+# 1	voted with majority or plurality
+# 2	dissent
+# 3	regular concurrence
+# 4	special concurrence
+# 5	judgment of the Court
+# 6	dissent from a denial or dismissal of certiorari , or dissent from summary affirmation of an appeal
+# 7	jurisdictional dissent
+# 8	justice participated in an equally divided vote
+
+png("outputs/votes.png", width=6, height=4, units="in", pointsize=8, res=300)
+  ggplot(rulings, aes(x=dateDecision, y=vote, color=PLOTNAME))+
+    geom_line(show.legend = FALSE)+
+    scale_colour_manual(values = c(rainbow(length(levels(rulings$PLOTNAME))-1), "grey75"), name = "") +
+    facet_wrap(~PLOTNAME)+
+    xlab("")+
+    ylab("Votes")+
+    theme_bw()
+dev.off()
+
+library(reshape2)
+rulings_sub <- rulings[rulings$PLOTNAME!="Other", ]
+rulings_wide <- dcast(rulings_sub, caseId + term + caseName ~ PLOTNAME, value.var="vote")
+
+png("outputs/votes_bycase.png", width=6, height=4, units="in", pointsize=8, res=300)
+  ggplot(rulings_sub[rulings_sub$term==2018, ], aes(x=decisionDirection, y=caseId, color=PLOTNAME))+
+    geom_point(position="jitter")+
+    scale_colour_manual(values = c(rainbow(length(levels(rulings_sub$PLOTNAME))-1), "grey75"), name = "")+
+    xlab("")+
+    ylab("Votes")+
     theme_bw()
 dev.off()
 ```
 
+```{r vote_agreement_matrix}
+# create empty dataframes
+agreedf <- data.frame(matrix(NA, nrow=12, ncol=12))
+rownames(agreedf) <- c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Roberts", "Kennedy", "Kagan", "Breyer","Ginsburg","Sotomayor")
+colnames(agreedf) <- c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Roberts", "Kennedy", "Kagan", "Breyer","Ginsburg","Sotomayor")
+overlapdf <- agreepdf <- agreedf
+
+for(i in 1:12){
+  justice1 <- rownames(agreedf)[i]
+  for(j in 1:12){
+    justice2 <- rownames(agreedf)[j]
+    
+    # count the number of cases justice1 agrees with justice2
+    agreedf[i, j] <- sum(rulings_wide[ , justice1]==rulings_wide[ , justice2], na.rm = TRUE)
+    
+    # count the total number of cases that overlap
+    overlapdf[i, j] <- sum(rulings_wide[ , justice1]!=rulings_wide[ , justice2], na.rm = TRUE) + sum(rulings_wide[ , justice1]==rulings_wide[ , justice2], na.rm = TRUE)
+    
+    # calculate the percentage of agreement 
+    agreepdf[i, j] <- agreedf[i, j]/overlapdf[i, j]
+  }
+}
+
+# library(ggcorrplot)
+# ggcorrplot(agreepdf, type="upper", ggtheme = ggplot2::theme_bw, colors=c("blue", "white", "red"))
+
+agreepdf$JUSTICE1 <- factor(rownames(agreepdf), levels=c("Thomas", "Alito", "Scalia", "Barrett", "Gorsuch", "Kavanaugh", "Roberts", "Kennedy", "Kagan", "Breyer","Ginsburg","Sotomayor"))
+agreepdf_melted <- melt(agreepdf, id.vars="JUSTICE1", variable.name="JUSTICE2", value.name="AGREEP")
+
+png("outputs/agreement.png", width=6, height=4, units="in", pointsize=8, res=300)
+  ggplot(data = agreepdf_melted, aes(x=JUSTICE1, y=JUSTICE2, fill=AGREEP, label=AGREEP))+
+    geom_tile(color = "white")+
+    #scale_fill_gradient(low = "orange", high = "blue", limit = c(0,1), space = "Lab", name="Agreement(%)") +
+    scale_fill_gradientn(colors = c("blue", "white", "red"), na.value = NA, limit = c(0,1), space = "Lab", name="Agreement")+
+    theme_bw()+ 
+    theme(axis.text.x = element_text(angle = 90, vjust = 0, size = 10, hjust = 1))+
+    geom_text(aes(x = JUSTICE1, y = JUSTICE2, label = round(AGREEP, 2)), size=2) +
+    coord_fixed()+
+    xlab("")+
+    ylab("")
+dev.off()
+```
+
+```{r issue_area}
+# 1	Criminal Procedure
+# 2	Civil Rights
+# 3	First Amendment
+# 4	Due Process
+# 5	Privacy
+# 6	Attorneys
+# 7	Unions
+# 8	Economic Activity
+# 9	Judicial Power
+# 10	Federalism
+# 11	Interstate Relations
+# 12	Federal Taxation
+# 13	Miscellaneous
+# 14	Private Action
+
+rulings_wide <- dcast(rulings, caseId + term + caseName + issueArea ~ justiceName, value.var="vote")
+rulings_wide_wide <- dcast(rulings_wide[,1:4], term ~ issueArea, fun=length)
+colnames(rulings_wide_wide) <- c("term", "Criminal_Procedure", "Civil_Rights", "First_Amendment", "Due_Process", "Privacy", "Attorneys", "Unions", "Economic_Activity", "Judicial_Power", "Federalism", "Interstate_Relations", "Federal_Taxation", "Miscellaneous", "Private_Action", "Value_NA")
+
+rulings_agg_long <- melt(rulings_wide_wide, id.vars="term", variable.name="issueArea", value.name="count")
+
+library(viridis)
+png("outputs/rulings_issueArea.png", width=6, height=4, units="in", pointsize=8, res=300)
+  ggplot(data = rulings_agg_long, aes(x=term, y=count, fill=issueArea))+
+    geom_area(position = 'stack') +
+    scale_fill_viridis(discrete = T) +
+    theme_bw()+ 
+    xlab("")+
+    ylab("Number of Cases Each Year")
+dev.off()
+
+png("outputs/rulings_issueArea_line.png", width=6.5, height=8, units="in", pointsize=8, res=300)
+  ggplot(data = rulings_agg_long, aes(x=term, y=count, group=issueArea, color=issueArea))+
+    geom_line(show.legend = FALSE) +
+    facet_wrap(~issueArea, ncol=3)+
+    scale_fill_viridis(discrete = T) +
+    theme_bw()+ 
+    xlab("")+
+    ylab("Number of Cases Each Year")
+dev.off()
+```
 
 
 
