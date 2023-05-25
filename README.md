@@ -1,6 +1,6 @@
 # README
 
-Welcome to this Git repository where you can produce this: 
+Welcome to this Git repository where you can produce the plot below and many more (see the outputs folder) 
 ![The U.S. Supreme Court](https://github.com/whiteellie/supreme-court/blob/master/outputs/mean_mq_scores.png)
 
 
