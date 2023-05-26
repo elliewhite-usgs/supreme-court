@@ -47,7 +47,7 @@ You can customize the package list as per your requirements. Simply include this
 
 ### 1. Download the R Markdown file
 
-You can download the R Markdown file from this Git repository by clicking on the "Download" button or by cloning the repository using the following command:
+You can download the R Markdown file from this Git repository by clicking on  "<>Code" then "Download ZIP" or by cloning the repository using the following command:
 
 ```
 git clone https://github.com/whiteellie/supreme-court.git
